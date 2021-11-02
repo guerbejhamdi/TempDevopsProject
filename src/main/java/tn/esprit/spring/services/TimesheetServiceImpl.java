@@ -74,28 +74,43 @@ public class TimesheetServiceImpl implements ITimesheetService {
 	
 	public void validerTimesheet(int missionId, int employeId, Date dateDebut, Date dateFin, int validateurId) {
 		LOGGER.info("In valider Timesheet");
-		Employe validateur = employeRepository.findById(validateurId).get();
-		Mission mission = missionRepository.findById(missionId).get();
-		//verifier s'il est un chef de departement (interet des enum)
-		if(!validateur.getRole().equals(Role.CHEF_DEPARTEMENT)){
-			LOGGER.info("l'employe doit etre chef de departement pour valider une feuille de temps !");
+		Employe validateur;
+		Optional<Employe> optValidateur = employeRepository.findById(validateurId);
+		if(optValidateur.isPresent()) {
+			validateur = optValidateur.get();
+			Optional<Mission> optMission = missionRepository.findById(missionId);
+			if(optMission.isPresent()) {
+				Mission mission;
+				//verifier s'il est un chef de departement (interet des enum)
+				if(!validateur.getRole().equals(Role.CHEF_DEPARTEMENT)){
+					LOGGER.info("l'employe doit etre chef de departement pour valider une feuille de temps !");
 
-			return;
-		}
-		//verifier s'il est le chef de departement de la mission en question
-		boolean chefDeLaMission = false;
-		for(Departement dep : validateur.getDepartements()){
-			if(dep.getId() == mission.getDepartement().getId()){
-				chefDeLaMission = true;
-				break;
+					return;
+				}
+				//verifier s'il est le chef de departement de la mission en question
+				boolean chefDeLaMission = false;
+				for(Departement dep : validateur.getDepartements()){
+					if(dep.getId() == mission.getDepartement().getId()){
+						chefDeLaMission = true;
+						break;
+					}
+				}
+
+				if(!chefDeLaMission){
+					LOGGER.info("l'employe doit etre chef de departement de la mission en question");
+
+					return;
+				}
+		//
 			}
+		
+			
 		}
-		if(!chefDeLaMission){
-			LOGGER.info("l'employe doit etre chef de departement de la mission en question");
-
-			return;
-		}
-//
+		
+		
+		
+	
+	
 		TimesheetPK timesheetPK = new TimesheetPK(missionId, employeId, dateDebut, dateFin);
 		Timesheet timesheet =timesheetRepository.findBytimesheetPK(timesheetPK);
 		timesheet.setValide(true);
