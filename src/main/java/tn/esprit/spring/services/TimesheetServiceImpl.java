@@ -75,11 +75,13 @@ public class TimesheetServiceImpl implements ITimesheetService {
 	public void validerTimesheet(int missionId, int employeId, Date dateDebut, Date dateFin, int validateurId) {
 		LOGGER.info("In valider Timesheet");
 		Employe validateur;
+		Mission mission;
+		boolean chefDeLaMission = false;
+
 		Optional<Employe> optValidateur = employeRepository.findById(validateurId);
 		if(optValidateur.isPresent()) {
 			validateur = optValidateur.get();
 			Optional<Mission> optMission = missionRepository.findById(missionId);
-			Mission mission;
 
 			if(optMission.isPresent()) {
 				mission = optMission.get();				//verifier s'il est un chef de departement (interet des enum)
@@ -89,7 +91,6 @@ public class TimesheetServiceImpl implements ITimesheetService {
 					return;
 				}
 				//verifier s'il est le chef de departement de la mission en question
-				boolean chefDeLaMission = false;
 				for(Departement dep : validateur.getDepartements()){
 					if(dep.getId() == mission.getDepartement().getId()){
 						chefDeLaMission = true;
@@ -97,14 +98,15 @@ public class TimesheetServiceImpl implements ITimesheetService {
 					}
 				}
 
-				if(!chefDeLaMission){
-					LOGGER.info("l'employe doit etre chef de departement de la mission en question");
-
-					return;
-				}
+				
 		//
 			}
 		
+			if(!chefDeLaMission){
+				LOGGER.info("l'employe doit etre chef de departement de la mission en question");
+
+				return;
+			}
 			
 		}
 		
