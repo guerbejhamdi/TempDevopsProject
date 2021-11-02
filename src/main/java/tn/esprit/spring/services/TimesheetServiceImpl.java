@@ -79,9 +79,10 @@ public class TimesheetServiceImpl implements ITimesheetService {
 		if(optValidateur.isPresent()) {
 			validateur = optValidateur.get();
 			Optional<Mission> optMission = missionRepository.findById(missionId);
+			Mission mission;
+
 			if(optMission.isPresent()) {
-				Mission mission;
-				//verifier s'il est un chef de departement (interet des enum)
+				mission = optMission.get();				//verifier s'il est un chef de departement (interet des enum)
 				if(!validateur.getRole().equals(Role.CHEF_DEPARTEMENT)){
 					LOGGER.info("l'employe doit etre chef de departement pour valider une feuille de temps !");
 
