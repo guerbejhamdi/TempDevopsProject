@@ -46,8 +46,11 @@ public class TimesheetServiceImpl implements ITimesheetService {
 		Optional<Mission> optMission = missionRepository.findById(missionId);
 		if(optMission.isPresent()) {
 			mission = optMission.get();
-			Departement dep = deptRepoistory.findById(depId).get();
-			mission.setDepartement(dep);
+			Optional<Departement> optDep = deptRepoistory.findById(depId);
+			if(optDep.isPresent()) {
+				mission.setDepartement(optDep.get());
+
+			}
 			missionRepository.save(mission);
 		}
 		
